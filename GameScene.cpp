@@ -29,9 +29,13 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input)
 
 	// テクスチャ読み込み
 	Sprite::LoadTexture(1, L"Resources/background.png");
+	Sprite::LoadTexture(2, L"Resources/texture.png");
 
 	// 背景スプライト生成
 	spriteBG = Sprite::Create(1, { 0.0f,0.0f });
+	sprite[0] = Sprite::Create(2, {});
+	sprite[1] = Sprite::Create(2, { 500,500 }, { 1,0,0,1 }, {}, false, true);
+
 	// 3Dオブジェクト生成
 	object3d = Object3d::Create();
 	object3d->Update();
@@ -62,6 +66,13 @@ void GameScene::Update()
 		else if (input->PushKey(DIK_S)) { Object3d::CameraMoveVector({ 0.0f,-1.0f,0.0f }); }
 		if (input->PushKey(DIK_D)) { Object3d::CameraMoveVector({ +1.0f,0.0f,0.0f }); }
 		else if (input->PushKey(DIK_A)) { Object3d::CameraMoveVector({ -1.0f,0.0f,0.0f }); }
+	}
+
+	if (input->PushKey(DIK_SPACE))
+	{
+		XMFLOAT2 position = sprite[0]->GetPosition();
+		position.x += 1.0f;
+		sprite[0]->SetPosition(position);
 	}
 
 	object3d->Update();
@@ -110,6 +121,8 @@ void GameScene::Draw()
 	/// <summary>
 	/// ここに前景スプライトの描画処理を追加できる
 	/// </summary>
+	sprite[0]->Draw();
+	sprite[1]->Draw();
 
 	// デバッグテキストの描画
 	debugText.DrawAll(cmdList);
