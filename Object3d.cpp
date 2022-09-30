@@ -1,6 +1,8 @@
 ﻿#include "Object3d.h"
 #include <d3dcompiler.h>
 #include <DirectXTex.h>
+#include <fstream>
+#include <sstream>
 
 #pragma comment(lib, "d3dcompiler.lib")
 
@@ -30,16 +32,16 @@ XMFLOAT3 Object3d::target = { 0, 0, 0 };
 XMFLOAT3 Object3d::up = { 0, 1, 0 };
 D3D12_VERTEX_BUFFER_VIEW Object3d::vbView{};
 D3D12_INDEX_BUFFER_VIEW Object3d::ibView{};
-Object3d::VertexPosNormalUv Object3d::vertices[vertexCount];
-unsigned short Object3d::indices[planeCount * 3];
+vector<Object3d::VertexPosNormalUv> Object3d::vertices;
+vector<unsigned short> Object3d::indices;
 
-void Object3d::StaticInitialize(ID3D12Device * device, int window_width, int window_height)
+void Object3d::StaticInitialize(ID3D12Device* device, int window_width, int window_height)
 {
 	// nullptrチェック
 	assert(device);
 
 	Object3d::device = device;
-		
+
 	// デスクリプタヒープの初期化
 	InitializeDescriptorHeap();
 
@@ -57,7 +59,7 @@ void Object3d::StaticInitialize(ID3D12Device * device, int window_width, int win
 
 }
 
-void Object3d::PreDraw(ID3D12GraphicsCommandList * cmdList)
+void Object3d::PreDraw(ID3D12GraphicsCommandList* cmdList)
 {
 	// PreDrawとPostDrawがペアで呼ばれていなければエラー
 	assert(Object3d::cmdList == nullptr);
@@ -79,7 +81,7 @@ void Object3d::PostDraw()
 	Object3d::cmdList = nullptr;
 }
 
-Object3d * Object3d::Create()
+Object3d* Object3d::Create()
 {
 	// 3Dオブジェクトのインスタンスを生成
 	Object3d* object3d = new Object3d();
@@ -93,6 +95,9 @@ Object3d * Object3d::Create()
 		assert(0);
 		return nullptr;
 	}
+
+	float scale_val = 20;
+	object3d->scale = { scale_val ,scale_val ,scale_val };
 
 	return object3d;
 }
@@ -131,7 +136,7 @@ void Object3d::CameraMoveVector(XMFLOAT3 move)
 void Object3d::InitializeDescriptorHeap()
 {
 	HRESULT result = S_FALSE;
-	
+
 	// デスクリプタヒープを生成	
 	D3D12_DESCRIPTOR_HEAP_DESC descHeapDesc = {};
 	descHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
@@ -322,7 +327,7 @@ void Object3d::LoadTexture()
 	ScratchImage scratchImg{};
 
 	// WICテクスチャのロード
-	result = LoadFromWICFile( L"Resources/tex1.png", WIC_FLAGS_NONE, &metadata, scratchImg);
+	result = LoadFromWICFile(L"Resources/tex1.png", WIC_FLAGS_NONE, &metadata, scratchImg);
 	assert(SUCCEEDED(result));
 
 	ScratchImage mipChain{};
@@ -389,9 +394,49 @@ void Object3d::LoadTexture()
 void Object3d::CreateModel()
 {
 	HRESULT result = S_FALSE;
+	ifstream file;
+	file.open("Resources/triangle/triangle.obj");
+	assert(!file.fail());
+
+	vector<XMFLOAT3> positions, normals;
+	vector<XMFLOAT2> texcoords;
+
+	string line;
+	while (getline(file, line))
+	{
+		istringstream line_stream(line);
+		string key;
+		getline(line_stream, key, ' ');
+
+		// 頂点座標読み込み
+		if (key == "v")
+		{
+			XMFLOAT3 position{};
+			line_stream >> position.x;
+			line_stream >> position.y;
+			line_stream >> position.z;
+			positions.emplace_back(position);
+
+			VertexPosNormalUv vertex{};
+			vertex.pos = position;
+			vertices.emplace_back(vertex);
+		}
+		// 頂点インデックス読み込み
+		if (key == "f")
+		{
+			string index_string;
+			while (getline(line_stream, index_string, ' '))
+			{
+				istringstream index_stream(index_string);
+				unsigned short indexPosition;
+				index_stream >> indexPosition;
+				indices.emplace_back(indexPosition - 1);
+			}
+		}
+	}
 
 	std::vector<VertexPosNormalUv> realVertices;
-	// 頂点座標の計算（重複あり）
+	/* 頂点座標の計算（重複あり）
 	{
 		realVertices.resize((division + 1) * 2);
 		int index = 0;
@@ -507,9 +552,9 @@ void Object3d::CreateModel()
 		XMStoreFloat3(&vertices[index0].normal, normal);
 		XMStoreFloat3(&vertices[index1].normal, normal);
 		XMStoreFloat3(&vertices[index2].normal, normal);
-	}
+	}*/
 
-	UINT sizeVB = static_cast<UINT>(sizeof(vertices));
+	UINT sizeVB = static_cast<UINT>(sizeof(VertexPosNormalUv) * vertices.size());
 
 	// ヒーププロパティ
 	CD3DX12_HEAP_PROPERTIES heapProps = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
@@ -526,16 +571,16 @@ void Object3d::CreateModel()
 	VertexPosNormalUv* vertMap = nullptr;
 	result = vertBuff->Map(0, nullptr, (void**)&vertMap);
 	if (SUCCEEDED(result)) {
-		memcpy(vertMap, vertices, sizeof(vertices));
+		copy(vertices.begin(), vertices.end(), vertMap);
 		vertBuff->Unmap(0, nullptr);
 	}
 
 	// 頂点バッファビューの作成
 	vbView.BufferLocation = vertBuff->GetGPUVirtualAddress();
-	vbView.SizeInBytes = sizeof(vertices);
+	vbView.SizeInBytes = sizeVB;
 	vbView.StrideInBytes = sizeof(vertices[0]);
 
-	UINT sizeIB = static_cast<UINT>(sizeof(indices));
+	UINT sizeIB = static_cast<UINT>(sizeof(unsigned short) * indices.size());
 	// リソース設定
 	resourceDesc.Width = sizeIB;
 
@@ -550,10 +595,7 @@ void Object3d::CreateModel()
 	if (SUCCEEDED(result)) {
 
 		// 全インデックスに対して
-		for (int i = 0; i < _countof(indices); i++)
-		{
-			indexMap[i] = indices[i];	// インデックスをコピー
-		}
+		copy(indices.begin(), indices.end(), indexMap);	// インデックスをコピー
 
 		indexBuff->Unmap(0, nullptr);
 	}
@@ -561,7 +603,7 @@ void Object3d::CreateModel()
 	// インデックスバッファビューの作成
 	ibView.BufferLocation = indexBuff->GetGPUVirtualAddress();
 	ibView.Format = DXGI_FORMAT_R16_UINT;
-	ibView.SizeInBytes = sizeof(indices);
+	ibView.SizeInBytes = sizeIB;
 }
 
 void Object3d::UpdateViewMatrix()
@@ -631,7 +673,7 @@ void Object3d::Draw()
 	// nullptrチェック
 	assert(device);
 	assert(Object3d::cmdList);
-		
+
 	// 頂点バッファの設定
 	cmdList->IASetVertexBuffers(0, 1, &vbView);
 	// インデックスバッファの設定
@@ -646,5 +688,5 @@ void Object3d::Draw()
 	// シェーダリソースビューをセット
 	cmdList->SetGraphicsRootDescriptorTable(1, gpuDescHandleSRV);
 	// 描画コマンド
-	cmdList->DrawIndexedInstanced(_countof(indices), 1, 0, 0, 0);
+	cmdList->DrawIndexedInstanced((UINT)indices.size(), 1, 0, 0, 0);
 }

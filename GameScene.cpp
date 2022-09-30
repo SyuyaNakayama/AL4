@@ -121,8 +121,8 @@ void GameScene::Draw()
 	/// <summary>
 	/// ここに前景スプライトの描画処理を追加できる
 	/// </summary>
-	sprite[0]->Draw();
-	sprite[1]->Draw();
+	//sprite[0]->Draw();
+	//sprite[1]->Draw();
 
 	// デバッグテキストの描画
 	debugText.DrawAll(cmdList);
