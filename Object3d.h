@@ -34,10 +34,37 @@ public: // サブクラス
 	};
 
 	// 定数バッファ用データ構造体
-	struct ConstBufferData
+	struct ConstBufferDataB0
 	{
-		XMFLOAT4 color;	// 色 (RGBA)
 		XMMATRIX mat;	// ３Ｄ変換行列
+	};
+	struct ConstBufferDataB1
+	{
+		XMFLOAT3 ambient;
+		float pad1;
+		XMFLOAT3 diffuse;
+		float pad2;
+		XMFLOAT3 specular;
+		float alpha;
+	};
+
+	// マテリアル
+	struct Material
+	{
+		string name;
+		XMFLOAT3 ambient;
+		XMFLOAT3 diffuse;
+		XMFLOAT3 specular;
+		float alpha;
+		string textureFilename;
+
+		Material()
+		{
+			ambient = { 0.3f,0.3f,0.3f };
+			diffuse = {};
+			specular = {};
+			alpha = 1.0f;
+		}
 	};
 
 private: // 定数
@@ -144,6 +171,8 @@ private: // 静的メンバ変数
 	static vector<VertexPosNormalUv> vertices;
 	// 頂点インデックス配列
 	static vector<unsigned short> indices;
+	// マテリアル
+	static Material material;
 
 private:// 静的メンバ関数
 	/// <summary>
@@ -167,7 +196,12 @@ private:// 静的メンバ関数
 	/// <summary>
 	/// テクスチャ読み込み
 	/// </summary>
-	static void LoadTexture();
+	static void LoadTexture(const string& DIRECTORY_PATH, const string& FILENAME);
+
+	/// <summary>
+	/// マテリアル読み込み
+	/// </summary>
+	static void LoadMaterial(const string& DIRECTORY_PATH, const string& FILENAME);
 
 	/// <summary>
 	/// モデル作成
@@ -204,7 +238,8 @@ public: // メンバ関数
 	void SetPosition(const XMFLOAT3& position) { this->position = position; }
 
 private: // メンバ変数
-	ComPtr<ID3D12Resource> constBuff; // 定数バッファ
+	// 定数バッファ
+	ComPtr<ID3D12Resource> constBuffB0, constBuffB1;
 	// 色
 	XMFLOAT4 color = { 1,1,1,1 };
 	// ローカルスケール
