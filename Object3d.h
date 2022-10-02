@@ -7,6 +7,7 @@
 #include <d3dx12.h>
 #include <string>
 #include <vector>
+#include "Model.h"
 
 using namespace std;
 
@@ -25,13 +26,6 @@ private: // エイリアス
 	using XMMATRIX = DirectX::XMMATRIX;
 
 public: // サブクラス
-	// 頂点データ構造体
-	struct VertexPosNormalUv
-	{
-		XMFLOAT3 pos; // xyz座標
-		XMFLOAT3 normal; // 法線ベクトル
-		XMFLOAT2 uv;  // uv座標
-	};
 
 	// 定数バッファ用データ構造体
 	struct ConstBufferDataB0
@@ -48,24 +42,6 @@ public: // サブクラス
 		float alpha;
 	};
 
-	// マテリアル
-	struct Material
-	{
-		string name;
-		XMFLOAT3 ambient;
-		XMFLOAT3 diffuse;
-		XMFLOAT3 specular;
-		float alpha;
-		string textureFilename;
-
-		Material()
-		{
-			ambient = { 0.3f,0.3f,0.3f };
-			diffuse = {};
-			specular = {};
-			alpha = 1.0f;
-		}
-	};
 
 private: // 定数
 	static const int division = 50;					// 分割数
@@ -82,17 +58,6 @@ public: // 静的メンバ関数
 	/// <param name="window_width">画面幅</param>
 	/// <param name="window_height">画面高さ</param>
 	static void StaticInitialize(ID3D12Device* device, int window_width, int window_height);
-
-	/// <summary>
-	/// 描画前処理
-	/// </summary>
-	/// <param name="cmdList">描画コマンドリスト</param>
-	static void PreDraw(ID3D12GraphicsCommandList* cmdList);
-
-	/// <summary>
-	/// 描画後処理
-	/// </summary>
-	static void PostDraw();
 
 	/// <summary>
 	/// 3Dオブジェクト生成
@@ -133,26 +98,10 @@ public: // 静的メンバ関数
 private: // 静的メンバ変数
 	// デバイス
 	static ID3D12Device* device;
-	// デスクリプタサイズ
-	static UINT descriptorHandleIncrementSize;
-	// コマンドリスト
-	static ID3D12GraphicsCommandList* cmdList;
 	// ルートシグネチャ
 	static ComPtr<ID3D12RootSignature> rootsignature;
 	// パイプラインステートオブジェクト
 	static ComPtr<ID3D12PipelineState> pipelinestate;
-	// デスクリプタヒープ
-	static ComPtr<ID3D12DescriptorHeap> descHeap;
-	// 頂点バッファ
-	static ComPtr<ID3D12Resource> vertBuff;
-	// インデックスバッファ
-	static ComPtr<ID3D12Resource> indexBuff;
-	// テクスチャバッファ
-	static ComPtr<ID3D12Resource> texbuff;
-	// シェーダリソースビューのハンドル(CPU)
-	static CD3DX12_CPU_DESCRIPTOR_HANDLE cpuDescHandleSRV;
-	// シェーダリソースビューのハンドル(CPU)
-	static CD3DX12_GPU_DESCRIPTOR_HANDLE gpuDescHandleSRV;
 	// ビュー行列
 	static XMMATRIX matView;
 	// 射影行列
@@ -163,22 +112,8 @@ private: // 静的メンバ変数
 	static XMFLOAT3 target;
 	// 上方向ベクトル
 	static XMFLOAT3 up;
-	// 頂点バッファビュー
-	static D3D12_VERTEX_BUFFER_VIEW vbView;
-	// インデックスバッファビュー
-	static D3D12_INDEX_BUFFER_VIEW ibView;
-	// 頂点データ配列
-	static vector<VertexPosNormalUv> vertices;
-	// 頂点インデックス配列
-	static vector<unsigned short> indices;
-	// マテリアル
-	static Material material;
 
 private:// 静的メンバ関数
-	/// <summary>
-	/// デスクリプタヒープの初期化
-	/// </summary>
-	static void InitializeDescriptorHeap();
 
 	/// <summary>
 	/// カメラ初期化
@@ -192,21 +127,6 @@ private:// 静的メンバ関数
 	/// </summary>
 	/// <returns>成否</returns>
 	static void InitializeGraphicsPipeline();
-
-	/// <summary>
-	/// テクスチャ読み込み
-	/// </summary>
-	static void LoadTexture(const string& DIRECTORY_PATH, const string& FILENAME);
-
-	/// <summary>
-	/// マテリアル読み込み
-	/// </summary>
-	static void LoadMaterial(const string& DIRECTORY_PATH, const string& FILENAME);
-
-	/// <summary>
-	/// モデル作成
-	/// </summary>
-	static void CreateModel();
 
 	/// <summary>
 	/// ビュー行列を更新
@@ -237,6 +157,8 @@ public: // メンバ関数
 	/// <param name="position">座標</param>
 	void SetPosition(const XMFLOAT3& position) { this->position = position; }
 
+	void SetModel(Model* model) { this->model = model; }
+
 private: // メンバ変数
 	// 定数バッファ
 	ComPtr<ID3D12Resource> constBuffB0, constBuffB1;
@@ -252,5 +174,7 @@ private: // メンバ変数
 	XMMATRIX matWorld;
 	// 親オブジェクト
 	Object3d* parent = nullptr;
+	// モデル
+	Model* model = nullptr;
 };
 
