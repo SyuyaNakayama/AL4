@@ -38,7 +38,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input)
 	model->Initialize();
 	model->Create();
 
-	for (size_t i = 0; i < 2; i++)
+	for (size_t i = 0; i < 1; i++)
 	{
 		object3d.push_back({});
 		object3d[i] = Object3d::Create();

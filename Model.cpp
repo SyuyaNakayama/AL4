@@ -165,7 +165,7 @@ void Model::Create()
 {
 	HRESULT result = S_FALSE;
 	ifstream file;
-	const string MODELNAME = "triangle_mat",
+	const string MODELNAME = "player",
 		FILENAME = MODELNAME + ".obj",
 		DIRECTORY_PATH = "Resources/" + MODELNAME + "/";
 	file.open(DIRECTORY_PATH + FILENAME);
