@@ -60,7 +60,7 @@ private: // メンバ変数
 	/// ゲームシーン用
 	/// </summary>
 	Sprite* spriteBG = nullptr;
-	Object3d* object3d = nullptr;
-	Sprite* sprite[2] = { nullptr,nullptr };
+	std::vector<Object3d*> object3d;
+	Model* model = nullptr;
 };
 

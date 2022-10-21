@@ -155,6 +155,12 @@ void Model::LoadMaterial(const string& DIRECTORY_PATH, const string& FILENAME)
 	file.close();
 }
 
+void Model::Initialize()
+{
+	InitializeDescriptorHeap();
+	InitializeGraphicsPipeline();
+}
+
 void Model::Create()
 {
 	HRESULT result = S_FALSE;

@@ -183,4 +183,8 @@ void Object3d::Update()
 
 void Object3d::Draw()
 {
+	ID3D12GraphicsCommandList* cmdList = model->GetCommandList();
+	cmdList->SetGraphicsRootConstantBufferView(0, constBuffB0->GetGPUVirtualAddress());
+	cmdList->SetGraphicsRootConstantBufferView(1, constBuffB1->GetGPUVirtualAddress());
+	model->Draw();
 }

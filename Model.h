@@ -116,9 +116,12 @@ public:
 	
 	Material GetMaterial() { return material; }
 
+	ID3D12GraphicsCommandList* GetCommandList() { return cmdList; }
 	/// <summary>
 	/// ƒ‚ƒfƒ‹ì¬
 	/// </summary>
+	void Initialize();
+	 
 	void Create();
 
 	void Draw();

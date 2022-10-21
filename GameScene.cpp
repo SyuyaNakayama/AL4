@@ -10,7 +10,8 @@ GameScene::GameScene()
 GameScene::~GameScene()
 {
 	delete spriteBG;
-	delete object3d;
+	for (Object3d* object : object3d) { delete object; }
+	delete model;
 }
 
 void GameScene::Initialize(DirectXCommon* dxCommon, Input* input)
@@ -29,16 +30,21 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input)
 
 	// テクスチャ読み込み
 	Sprite::LoadTexture(1, L"Resources/background.png");
-	Sprite::LoadTexture(2, L"Resources/texture.png");
 
 	// 背景スプライト生成
 	spriteBG = Sprite::Create(1, { 0.0f,0.0f });
-	sprite[0] = Sprite::Create(2, {});
-	sprite[1] = Sprite::Create(2, { 500,500 }, { 1,0,0,1 }, {}, false, true);
 
 	// 3Dオブジェクト生成
-	object3d = Object3d::Create();
-	object3d->Update();
+	model->Initialize();
+	model->Create();
+
+	for (size_t i = 0; i < 2; i++)
+	{
+		object3d.push_back({});
+		object3d[i] = Object3d::Create();
+		object3d[i]->SetModel(model);
+		object3d[i]->Update();
+	}
 }
 
 void GameScene::Update()
@@ -47,7 +53,7 @@ void GameScene::Update()
 	if (input->PushKey(DIK_UP) || input->PushKey(DIK_DOWN) || input->PushKey(DIK_RIGHT) || input->PushKey(DIK_LEFT))
 	{
 		// 現在の座標を取得
-		XMFLOAT3 position = object3d->GetPosition();
+		XMFLOAT3 position = object3d[0]->GetPosition();
 
 		// 移動後の座標を計算
 		if (input->PushKey(DIK_UP)) { position.y += 1.0f; }
@@ -56,7 +62,7 @@ void GameScene::Update()
 		else if (input->PushKey(DIK_LEFT)) { position.x -= 1.0f; }
 
 		// 座標の変更を反映
-		object3d->SetPosition(position);
+		object3d[0]->SetPosition(position);
 	}
 
 	// カメラ移動
@@ -68,14 +74,7 @@ void GameScene::Update()
 		else if (input->PushKey(DIK_A)) { Object3d::CameraMoveVector({ -1.0f,0.0f,0.0f }); }
 	}
 
-	if (input->PushKey(DIK_SPACE))
-	{
-		XMFLOAT2 position = sprite[0]->GetPosition();
-		position.x += 1.0f;
-		sprite[0]->SetPosition(position);
-	}
-
-	object3d->Update();
+	for (Object3d* object : object3d) { object->Update(); }
 }
 
 void GameScene::Draw()
@@ -104,7 +103,7 @@ void GameScene::Draw()
 	Model::PreDraw(cmdList);
 
 	// 3Dオブクジェクトの描画
-	object3d->Draw();
+	for (Object3d* object : object3d) { object->Draw(); }
 
 	/// <summary>
 	/// ここに3Dオブジェクトの描画処理を追加できる
@@ -121,8 +120,6 @@ void GameScene::Draw()
 	/// <summary>
 	/// ここに前景スプライトの描画処理を追加できる
 	/// </summary>
-	//sprite[0]->Draw();
-	//sprite[1]->Draw();
 
 	// デバッグテキストの描画
 	debugText.DrawAll(cmdList);
