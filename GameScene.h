@@ -6,6 +6,7 @@
 #include "Sprite.h"
 #include "Object3d.h"
 #include "DebugText.h"
+#include "CollisionPrimitive.h"
 
 /// <summary>
 /// ゲームシーン
@@ -25,12 +26,6 @@ private: // 静的メンバ変数
 	static const int debugTextTexNumber = 0;
 
 public: // メンバ関数
-
-	/// <summary>
-	/// コンストクラタ
-	/// </summary>
-	GameScene();
-
 	/// <summary>
 	/// デストラクタ
 	/// </summary>
@@ -62,5 +57,7 @@ private: // メンバ変数
 	Sprite* spriteBG = nullptr;
 	std::vector<Object3d*> object3d;
 	Model* model = nullptr;
+	Sphere sphere;
+	Plane plane;
 };
 

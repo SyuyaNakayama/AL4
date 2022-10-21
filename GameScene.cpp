@@ -1,11 +1,10 @@
 ﻿#include "GameScene.h"
+#include "Collision.h"
 #include <cassert>
+#include <sstream>
+#include <iomanip>
 
 using namespace DirectX;
-
-GameScene::GameScene()
-{
-}
 
 GameScene::~GameScene()
 {
@@ -45,24 +44,60 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input)
 		object3d[i]->SetModel(model);
 		object3d[i]->Update();
 	}
+
+	sphere = { {0,2,0},1.0f };
+	plane = { {0,1,0},0 };
 }
 
 void GameScene::Update()
 {
 	// オブジェクト移動
-	if (input->PushKey(DIK_UP) || input->PushKey(DIK_DOWN) || input->PushKey(DIK_RIGHT) || input->PushKey(DIK_LEFT))
+	//if (input->PushKey(DIK_UP) || input->PushKey(DIK_DOWN) || input->PushKey(DIK_RIGHT) || input->PushKey(DIK_LEFT))
+	//{
+	//	// 現在の座標を取得
+	//	XMFLOAT3 position = object3d[0]->GetPosition();
+	//
+	//	// 移動後の座標を計算
+	//	if (input->PushKey(DIK_UP)) { position.y += 1.0f; }
+	//	else if (input->PushKey(DIK_DOWN)) { position.y -= 1.0f; }
+	//	if (input->PushKey(DIK_RIGHT)) { position.x += 1.0f; }
+	//	else if (input->PushKey(DIK_LEFT)) { position.x -= 1.0f; }
+	//
+	//	// 座標の変更を反映
+	//	object3d[0]->SetPosition(position);
+	//}
+
+	float moveSpd = 0.01f;
+
+	sphere.center +=
 	{
-		// 現在の座標を取得
-		XMFLOAT3 position = object3d[0]->GetPosition();
+		(input->PushKey(DIK_RIGHT) - input->PushKey(DIK_LEFT))* moveSpd,
+			(input->PushKey(DIK_UP) - input->PushKey(DIK_DOWN))* moveSpd,
+			0
+	};
 
-		// 移動後の座標を計算
-		if (input->PushKey(DIK_UP)) { position.y += 1.0f; }
-		else if (input->PushKey(DIK_DOWN)) { position.y -= 1.0f; }
-		if (input->PushKey(DIK_RIGHT)) { position.x += 1.0f; }
-		else if (input->PushKey(DIK_LEFT)) { position.x -= 1.0f; }
+	std::ostringstream spherestr;
+	spherestr << "Sphere:("
+		<< std::fixed << std::setprecision(2)
+		<< sphere.center.x << ","
+		<< sphere.center.y << ","
+		<< sphere.center.z << ")";
 
-		// 座標の変更を反映
-		object3d[0]->SetPosition(position);
+	debugText.Print(spherestr.str(), 50, 180, 1.0f);
+
+	Vector3 inter;
+	if (Collision::CheckSphere2Plane(sphere, plane, &inter))
+	{
+		debugText.Print("HIT", 50, 200, 1.0f);
+
+		spherestr.str("");
+		spherestr.clear();
+		spherestr << "("
+			<< std::fixed << std::setprecision(2)
+			<< inter.x << ","
+			<< inter.y << ","
+			<< inter.z << ")";
+		debugText.Print(spherestr.str(), 50, 220, 1.0f);
 	}
 
 	// カメラ移動
@@ -103,7 +138,7 @@ void GameScene::Draw()
 	Model::PreDraw(cmdList);
 
 	// 3Dオブクジェクトの描画
-	for (Object3d* object : object3d) { object->Draw(); }
+	//for (Object3d* object : object3d) { object->Draw(); }
 
 	/// <summary>
 	/// ここに3Dオブジェクトの描画処理を追加できる
