@@ -75,8 +75,13 @@ private:
 	static ComPtr<ID3D12DescriptorHeap> descHeap;
 	// デスクリプタサイズ
 	static UINT descriptorHandleIncrementSize;
+	// パイプラインステートオブジェクト
+	static ComPtr<ID3D12PipelineState> pipelinestate;
+	// ルートシグネチャ
+	static ComPtr<ID3D12RootSignature> rootsignature;
 
 public:
+	static void StaticInitialize(ID3D12Device* device);
 	/// <summary>
 	/// 描画前処理
 	/// </summary>
@@ -92,6 +97,12 @@ public:
 	/// デスクリプタヒープの初期化
 	/// </summary>
 	static void InitializeDescriptorHeap();
+
+	/// <summary>
+	/// グラフィックパイプライン生成
+	/// </summary>
+	/// <returns>成否</returns>
+	static void InitializeGraphicsPipeline();
 
 	/// <summary>
 	/// テクスチャ読み込み

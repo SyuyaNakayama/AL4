@@ -42,7 +42,6 @@ public: // サブクラス
 		float alpha;
 	};
 
-
 private: // 定数
 	static const int division = 50;					// 分割数
 	static const float radius;				// 底面の半径
@@ -98,10 +97,6 @@ public: // 静的メンバ関数
 private: // 静的メンバ変数
 	// デバイス
 	static ID3D12Device* device;
-	// ルートシグネチャ
-	static ComPtr<ID3D12RootSignature> rootsignature;
-	// パイプラインステートオブジェクト
-	static ComPtr<ID3D12PipelineState> pipelinestate;
 	// ビュー行列
 	static XMMATRIX matView;
 	// 射影行列
@@ -121,12 +116,6 @@ private:// 静的メンバ関数
 	/// <param name="window_width">画面横幅</param>
 	/// <param name="window_height">画面縦幅</param>
 	static void InitializeCamera(int window_width, int window_height);
-
-	/// <summary>
-	/// グラフィックパイプライン生成
-	/// </summary>
-	/// <returns>成否</returns>
-	static void InitializeGraphicsPipeline();
 
 	/// <summary>
 	/// ビュー行列を更新
