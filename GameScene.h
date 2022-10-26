@@ -61,6 +61,6 @@ private: // メンバ変数
 	/// </summary>
 	Sprite* spriteBG = nullptr;
 	std::vector<Object3d*> object3d;
-	Model* model = nullptr;
+	std::vector<Model*> model;
 };
 

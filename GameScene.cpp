@@ -11,7 +11,7 @@ GameScene::~GameScene()
 {
 	delete spriteBG;
 	for (Object3d* object : object3d) { delete object; }
-	delete model;
+	for (Model* model : model) { delete model; }
 }
 
 void GameScene::Initialize(DirectXCommon* dxCommon, Input* input)
@@ -35,16 +35,25 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input)
 	spriteBG = Sprite::Create(1, { 0.0f,0.0f });
 
 	// 3Dオブジェクト生成
-	model->Initialize();
-	model->Create();
+	model.resize(2);
+	for (size_t i = 0; i < 2; i++)
+	{
+		model[i] = new Model();
+		model[i]->Initialize();
+	}
+	model[0]->Create();
+	model[1]->Create("cube");
 
-	for (size_t i = 0; i < 1; i++)
+	for (size_t i = 0; i < 2; i++)
 	{
 		object3d.push_back({});
 		object3d[i] = Object3d::Create();
-		object3d[i]->SetModel(model);
+		object3d[i]->SetModel(model[i]);
 		object3d[i]->Update();
 	}
+
+	object3d[1]->SetPosition({ -50.0f,0,0 });
+	Object3d::SetEye({ 0,0,-100.0f });
 }
 
 void GameScene::Update()

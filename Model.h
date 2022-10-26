@@ -52,21 +52,21 @@ private:
 	// コマンドリスト
 	static ID3D12GraphicsCommandList* cmdList;
 	// 頂点バッファ
-	static ComPtr<ID3D12Resource> vertBuff;
+	ComPtr<ID3D12Resource> vertBuff;
 	// インデックスバッファ
-	static ComPtr<ID3D12Resource> indexBuff;
+	ComPtr<ID3D12Resource> indexBuff;
 	// 頂点バッファビュー
-	static D3D12_VERTEX_BUFFER_VIEW vbView;
+	D3D12_VERTEX_BUFFER_VIEW vbView;
 	// インデックスバッファビュー
-	static D3D12_INDEX_BUFFER_VIEW ibView;
+	D3D12_INDEX_BUFFER_VIEW ibView;
 	// テクスチャバッファ
-	static ComPtr<ID3D12Resource> texbuff;
+	ComPtr<ID3D12Resource> texbuff;
 	// 頂点データ配列
-	static vector<VertexPosNormalUv> vertices;
+	vector<VertexPosNormalUv> vertices;
 	// 頂点インデックス配列
-	static vector<unsigned short> indices;
+	vector<unsigned short> indices;
 	// マテリアル
-	static Material material;
+	Material material;
 	// シェーダリソースビューのハンドル(CPU)
 	static CD3DX12_CPU_DESCRIPTOR_HANDLE cpuDescHandleSRV;
 	// シェーダリソースビューのハンドル(CPU)
@@ -92,7 +92,7 @@ public:
 	/// 描画後処理
 	/// </summary>
 	static void PostDraw();
-	
+
 	/// <summary>
 	/// デスクリプタヒープの初期化
 	/// </summary>
@@ -107,13 +107,13 @@ public:
 	/// <summary>
 	/// テクスチャ読み込み
 	/// </summary>
-	static void LoadTexture(const string& DIRECTORY_PATH, const string& FILENAME);
+	void LoadTexture(const string& DIRECTORY_PATH, const string& FILENAME);
 
 	/// <summary>
 	/// マテリアル読み込み
 	/// </summary>
 	void LoadMaterial(const string& DIRECTORY_PATH, const string& FILENAME);
-	
+
 	Material GetMaterial() { return material; }
 
 	ID3D12GraphicsCommandList* GetCommandList() { return cmdList; }
@@ -121,8 +121,8 @@ public:
 	/// モデル作成
 	/// </summary>
 	void Initialize();
-	 
-	void Create();
+
+	void Create(std::string modelName = "player");
 
 	void Draw();
 };

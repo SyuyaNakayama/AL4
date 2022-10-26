@@ -7,14 +7,6 @@
 using namespace DirectX;
 using namespace Microsoft::WRL;
 
-ComPtr<ID3D12Resource> Model::vertBuff;
-ComPtr<ID3D12Resource> Model::indexBuff;
-D3D12_VERTEX_BUFFER_VIEW Model::vbView{};
-D3D12_INDEX_BUFFER_VIEW Model::ibView{};
-vector<Model::VertexPosNormalUv> Model::vertices;
-vector<unsigned short> Model::indices;
-Model::Material Model::material;
-ComPtr<ID3D12Resource> Model::texbuff;
 CD3DX12_CPU_DESCRIPTOR_HANDLE Model::cpuDescHandleSRV;
 CD3DX12_GPU_DESCRIPTOR_HANDLE Model::gpuDescHandleSRV;
 ComPtr<ID3D12DescriptorHeap> Model::descHeap;
@@ -161,13 +153,12 @@ void Model::Initialize()
 	InitializeGraphicsPipeline();
 }
 
-void Model::Create()
+void Model::Create(std::string modelName)
 {
 	HRESULT result = S_FALSE;
 	ifstream file;
-	const string MODELNAME = "player",
-		FILENAME = MODELNAME + ".obj",
-		DIRECTORY_PATH = "Resources/" + MODELNAME + "/";
+	const string FILENAME = modelName + ".obj",
+		DIRECTORY_PATH = "Resources/" + modelName + "/";
 	file.open(DIRECTORY_PATH + FILENAME);
 	assert(!file.fail());
 
