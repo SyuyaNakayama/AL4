@@ -159,7 +159,8 @@ void Model::Create(std::string modelName)
 	ifstream file;
 	const string FILENAME = modelName + ".obj",
 		DIRECTORY_PATH = "Resources/" + modelName + "/";
-	file.open(DIRECTORY_PATH + FILENAME);
+	//file.open(DIRECTORY_PATH + FILENAME);
+	file.open("Resources/untitled.fbx");
 	assert(!file.fail());
 
 	vector<XMFLOAT3> positions, normals;
@@ -206,6 +207,7 @@ void Model::Create(std::string modelName)
 		if (key == "f")
 		{
 			string index_string;
+			vector<VertexPosNormalUv> vert;
 			while (getline(line_stream, index_string, ' '))
 			{
 				istringstream index_stream(index_string);
@@ -221,7 +223,19 @@ void Model::Create(std::string modelName)
 				vertex.normal = normals[indexNormal - 1];
 				vertex.uv = texcoords[indexTexcoord - 1];
 				vertices.emplace_back(vertex);
+				vert.emplace_back(vertex);
 				indices.emplace_back(indices.size());
+
+				if (vert.size() == 4)
+				{
+					vertices.pop_back();
+					for (size_t j = 0; j < 4; j++)
+					{
+						if (j == 1) { continue; }
+						vertices.push_back(vert[j]);
+						indices.emplace_back(indices.size());
+					}
+				}
 			}
 		}
 	}

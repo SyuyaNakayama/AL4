@@ -36,7 +36,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input)
 
 	// 3Dオブジェクト生成
 	model.resize(2);
-	for (size_t i = 0; i < 2; i++)
+	for (size_t i = 0; i < model.size(); i++)
 	{
 		model[i] = new Model();
 		model[i]->Initialize();
@@ -44,7 +44,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input)
 	model[0]->Create();
 	model[1]->Create("cube");
 
-	for (size_t i = 0; i < 2; i++)
+	for (size_t i = 0; i < model.size(); i++)
 	{
 		object3d.push_back({});
 		object3d[i] = Object3d::Create();
