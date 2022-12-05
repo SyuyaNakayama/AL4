@@ -51,57 +51,44 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input)
 	triangle.p[1] = { -1,0,1 };
 	triangle.p[2] = { 1,0,-1 };
 	triangle.normal = { 0,1,0 };
+	ray.start = { 0,1,0 };
+	ray.dir = { 0,-1,0 };
 }
 
 void GameScene::Update()
 {
-	// オブジェクト移動
-	//if (input->PushKey(DIK_UP) || input->PushKey(DIK_DOWN) || input->PushKey(DIK_RIGHT) || input->PushKey(DIK_LEFT))
-	//{
-	//	// 現在の座標を取得
-	//	XMFLOAT3 position = object3d[0]->GetPosition();
-	//
-	//	// 移動後の座標を計算
-	//	if (input->PushKey(DIK_UP)) { position.y += 1.0f; }
-	//	else if (input->PushKey(DIK_DOWN)) { position.y -= 1.0f; }
-	//	if (input->PushKey(DIK_RIGHT)) { position.x += 1.0f; }
-	//	else if (input->PushKey(DIK_LEFT)) { position.x -= 1.0f; }
-	//
-	//	// 座標の変更を反映
-	//	object3d[0]->SetPosition(position);
-	//}
-
 	float moveSpd = 0.01f;
 
-	sphere.center +=
+	ray.start +=
 	{
 		(input->PushKey(DIK_RIGHT) - input->PushKey(DIK_LEFT))* moveSpd,
 			(input->PushKey(DIK_UP) - input->PushKey(DIK_DOWN))* moveSpd,
 			0
 	};
 
-	std::ostringstream spherestr;
-	spherestr << "Sphere:("
+	std::ostringstream raystr;
+	raystr << "ray.start:("
 		<< std::fixed << std::setprecision(2)
-		<< sphere.center.x << ","
-		<< sphere.center.y << ","
-		<< sphere.center.z << ")";
+		<< ray.start.x << ","
+		<< ray.start.y << ","
+		<< ray.start.z << ")";
 
-	debugText.Print(spherestr.str(), 50, 180, 1.0f);
+	debugText.Print(raystr.str(), 50, 180, 1.0f);
 
 	Vector3 inter;
-	if (Collision::CheckSphere2Triangle(sphere, triangle, &inter))
+	float distance;
+	if (Collision::CheckRay2Plane(ray, plane, &distance,&inter))
 	{
 		debugText.Print("HIT", 50, 200, 1.0f);
 
-		spherestr.str("");
-		spherestr.clear();
-		spherestr << "("
+		raystr.str("");
+		raystr.clear();
+		raystr << "("
 			<< std::fixed << std::setprecision(2)
 			<< inter.x << ","
 			<< inter.y << ","
 			<< inter.z << ")";
-		debugText.Print(spherestr.str(), 50, 220, 1.0f);
+		debugText.Print(raystr.str(), 50, 220, 1.0f);
 	}
 
 	// カメラ移動

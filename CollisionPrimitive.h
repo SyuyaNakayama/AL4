@@ -15,5 +15,10 @@ struct Plane
 
 struct Triangle
 {
-	Vector3 p[3], normal;
+	Vector3 p[3]{}, normal{};
+};
+
+struct Ray
+{
+	Vector3 start, dir = { 1,0,0 };
 };
