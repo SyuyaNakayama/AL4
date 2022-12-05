@@ -47,6 +47,10 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input)
 
 	sphere = { {0,2,0},1.0f };
 	plane = { {0,1,0},0 };
+	triangle.p[0] = { -1,0,-1 };
+	triangle.p[1] = { -1,0,1 };
+	triangle.p[2] = { 1,0,-1 };
+	triangle.normal = { 0,1,0 };
 }
 
 void GameScene::Update()
@@ -86,7 +90,7 @@ void GameScene::Update()
 	debugText.Print(spherestr.str(), 50, 180, 1.0f);
 
 	Vector3 inter;
-	if (Collision::CheckSphere2Plane(sphere, plane, &inter))
+	if (Collision::CheckSphere2Triangle(sphere, triangle, &inter))
 	{
 		debugText.Print("HIT", 50, 200, 1.0f);
 

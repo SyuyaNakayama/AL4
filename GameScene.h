@@ -59,5 +59,5 @@ private: // メンバ変数
 	Model* model = nullptr;
 	Sphere sphere;
 	Plane plane;
+	Triangle triangle;
 };
-
