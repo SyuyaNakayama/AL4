@@ -16,6 +16,7 @@ struct Plane
 struct Triangle
 {
 	Vector3 p[3]{}, normal{};
+	void ComputeNormal();
 };
 
 struct Ray

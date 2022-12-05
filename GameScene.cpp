@@ -50,7 +50,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input)
 	triangle.p[0] = { -1,0,-1 };
 	triangle.p[1] = { -1,0,1 };
 	triangle.p[2] = { 1,0,-1 };
-	triangle.normal = { 0,1,0 };
+	triangle.ComputeNormal();
 	ray.start = { 0,1,0 };
 	ray.dir = { 0,-1,0 };
 }
@@ -62,8 +62,8 @@ void GameScene::Update()
 	ray.start +=
 	{
 		(input->PushKey(DIK_RIGHT) - input->PushKey(DIK_LEFT))* moveSpd,
-			(input->PushKey(DIK_UP) - input->PushKey(DIK_DOWN))* moveSpd,
-			0
+			0,
+			(input->PushKey(DIK_UP) - input->PushKey(DIK_DOWN))* moveSpd
 	};
 
 	std::ostringstream raystr;
@@ -77,7 +77,7 @@ void GameScene::Update()
 
 	Vector3 inter;
 	float distance;
-	if (Collision::CheckRay2Plane(ray, plane, &distance,&inter))
+	if (Collision::CheckRay2Triangle(ray, triangle, &distance,&inter))
 	{
 		debugText.Print("HIT", 50, 200, 1.0f);
 
